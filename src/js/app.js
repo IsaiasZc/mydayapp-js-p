@@ -35,7 +35,7 @@ export default class App {
         newTodo.value = "";
 
         this.toggleMainFooter();
-        this.todoList.innerHTML += this.newTaskElement(this.tasks[id]);
+        this.todoList.append(this.newTaskElement(this.tasks[id]));
 
         // Set the Local Storage
         this.setLocalStorage();
@@ -46,8 +46,8 @@ export default class App {
   }
 
   newTaskElement(task) {
-    return `
-    <li>
+    const listItem = document.createElement("li");
+    listItem.innerHTML = `
       <div class="view">
         <input class="toggle" type="checkbox" ${
           task.completed ? "checked" : ""
@@ -56,8 +56,36 @@ export default class App {
         <button class="destroy"></button>
       </div>
       <input class="edit" value="${task.task}" />
-    </li>
     `;
+
+    // Event to check the task
+    const check = listItem.querySelector(".toggle");
+    check.addEventListener("click", () => {
+      listItem.classList.toggle("completed");
+      task.completed = !task.completed;
+    });
+
+    // Event to Edit the task
+    const label = listItem.querySelector("label");
+    const editInput = listItem.querySelector(".edit");
+
+    label.addEventListener("dblclick", () => {
+      listItem.classList.add("editing");
+      editInput.focus();
+    });
+
+    editInput.addEventListener("keyup", (e) => {
+      if (e.key === "Enter") {
+        label.textContent = e.target.value;
+        task.task = e.target.value.trim();
+        listItem.classList.remove("editing");
+      } else if (e.key === "Escape") {
+        e.target.value = task.task;
+        listItem.classList.remove("editing");
+      }
+    });
+
+    return listItem;
   }
 
   createNewTask(task) {
@@ -76,8 +104,18 @@ export default class App {
   }
 
   modifyCounter() {
-    const todoCount = document.querySelector(".todo-count strong");
+    const todoCount = document.querySelector(".todo-count");
+    const counter = this.tasks.filter((task) => !task.completed).length;
 
-    todoCount.textContent = this.tasks.filter((task) => !task.completed).length;
+    todoCount.innerHTML =
+      counter !== 1
+        ? todoCount.innerHTML.replace("item ", "items ")
+        : todoCount.innerHTML.replace("items ", "item ");
+
+    const todoCountNumber = document.querySelector(".todo-count strong");
+
+    todoCountNumber.textContent = this.tasks.filter(
+      (task) => !task.completed
+    ).length;
   }
 }
