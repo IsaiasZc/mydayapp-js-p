@@ -1,5 +1,10 @@
+// import "./css/base.css";
+// import { sayHello } from "./js/utils";
+// console.log(sayHello("Hello"));
+
+import App from "./js/app.js";
 import "./css/base.css";
 
-import { sayHello } from "./js/utils";
+const app = new App();
 
-console.log(sayHello("Hello"));
+app.start();
